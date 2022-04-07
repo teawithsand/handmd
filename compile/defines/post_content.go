@@ -16,7 +16,7 @@ type PostContentEntry struct {
 	// It's content
 	Tag         string                  `json:"tag" toml:"tag" yaml:"tag"`
 	Content     string                  `json:"content" toml:"content" yaml:"content"`
-	ContentType tsrender.TagContentType `json:"contentType" toml:"content_type" yaml:"content_type"`
+	ContentType tsrender.TagLiteralType `json:"contentType" toml:"content_type" yaml:"content_type"`
 	Props       map[string]string       `json:"props,omitempty" toml:"props,omitempty" yaml:"props,omitempty"`
 }
 
