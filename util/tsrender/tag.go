@@ -1,153 +1,99 @@
 package tsrender
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"strings"
+	"io"
 )
 
-type TSMarhshaler interface {
-	MarshalTS() (res string, err error)
-}
+func marshalTagProps(ctx context.Context, props map[string]any, w io.Writer) (err error) {
+	for k, v := range props {
+		switch typedV := v.(type) {
+		// TODO(teawithsand): add more types here
+		case int:
+			_, err = w.Write([]byte(fmt.Sprint("%s={%s}\n", k, jsonSanitize(typedV))))
+			if err != nil {
+				return
+			}
+		case int64:
+			_, err = w.Write([]byte(fmt.Sprint("%s={%s}\n", k, jsonSanitize(typedV))))
+			if err != nil {
+				return
+			}
+		case string:
+			_, err = w.Write([]byte(fmt.Sprint("%s={%s}\n", k, jsonSanitize(typedV))))
+			if err != nil {
+				return
+			}
+		case LiteralTagContent: // This is HACK. It should be string literal or sth like that
+			var res string
+			res, err = typedV.Render(ctx)
+			if err != nil {
+				return
+			}
 
-type TSMarshalerWrapper struct {
-	TSMarhshaler
-}
-
-type Tag struct {
-	Name    string
-	Props   map[string]any // map of property name to anything, which can be marshaled for typescript.
-	Content []LiteralTagContentEntry
-}
-
-type TagContentType uint8
-
-const (
-	TagTypeDefault       TagContentType = 0 // Acts like TagTypeString if content is not empty or like TagTypeOmit if content's empty.
-	TagTypeString        TagContentType = 1 // json.Marshal sanitized string
-	TagTypeOmit          TagContentType = 2 // Omits content and emits tag given as self-closed.
-	TagTypeStringLiteral TagContentType = 3 // A "`" quotes js string, which can evalute JS expressions.
-	TagTypeRaw           TagContentType = 4 // Raw tag. Copies and pastes content in between ts tag.
-)
-
-func (tct TagContentType) String() string {
-	switch tct {
-	case TagTypeDefault:
-		return "default"
-	case TagTypeOmit:
-		return "omit"
-	case TagTypeString:
-		return "string"
-	case TagTypeStringLiteral:
-		return "quoteString"
-	case TagTypeRaw:
-		return "raw"
-	default:
-		return ""
-	}
-}
-func (tct *TagContentType) fromString(text string) (err error) {
-	switch text {
-	case TagTypeDefault.String():
-		*tct = TagTypeDefault
-	case TagTypeOmit.String():
-		*tct = TagTypeOmit
-	case TagTypeString.String():
-		*tct = TagTypeString
-	case TagTypeStringLiteral.String():
-		*tct = TagTypeStringLiteral
-	case TagTypeRaw.String():
-		*tct = TagTypeRaw
-	default:
-		err = fmt.Errorf("unknown tag content type: %s", text)
+			_, err = w.Write([]byte(fmt.Sprint("%s=%s\n", k, res)))
+			if err != nil {
+				return
+			}
+		default:
+			err = fmt.Errorf("unsupported type for tag props: %T", v)
+			return
+		}
 	}
 	return
 }
 
-// MarshalJSON marshals the enum as a quoted json string
-func (s TagContentType) MarshalJSON() ([]byte, error) {
-	buffer := bytes.NewBufferString(`"`)
-	buffer.WriteString(s.String())
-	buffer.WriteString(`"`)
-	return buffer.Bytes(), nil
+// Simple TSX tag, which has either no or only string child.
+type SimpleTag struct {
+	Name    string
+	Props   map[string]any // map of property name to anything, which can be marshaled for typescript.
+	Content LiteralTagContent
 }
 
-// UnmarshalJSON unmashals a quoted json string to the enum value
-func (s *TagContentType) UnmarshalJSON(b []byte) error {
-	var j string
-	err := json.Unmarshal(b, &j)
+func (t SimpleTag) Render(ctx context.Context, w io.Writer) (err error) {
+	sc, err := t.Content.IsSelfClosing()
 	if err != nil {
-		return err
+		return
 	}
-	s.fromString(j)
-	return nil
-}
 
-type TagContent []TagContentEntry
+	_, err = w.Write([]byte(fmt.Sprintf("<%s ", t.Name)))
+	if err != nil {
+		return
+	}
 
-func (tc TagContent) Render(ctx context.Context) (res string, err error) {
-	isFirsIter := true
-	for _, e := range tc {
-		if !isFirsIter {
-			res += "\n"
-		}
-		isFirsIter = false
+	err = marshalTagProps(ctx, t.Props, w)
+	if err != nil {
+		return
+	}
 
-		var immRes string
-		immRes, err = e.Render(ctx)
+	if sc {
+		_, err = w.Write([]byte("/>"))
 		if err != nil {
 			return
 		}
-		res += immRes
-	}
-	return
-}
-
-type TagContentEntry interface {
-	Render(ctx context.Context) (res string, err error)
-}
-
-type LiteralTagContentEntry struct {
-	Type    TagContentType
-	Content string
-}
-
-func jsonSanitize(text string) (res string) {
-	imm, err := json.Marshal(text)
-	if err != nil {
-		panic(err)
-	}
-	return string(imm)
-}
-
-func softSanitize(text string) (res string) {
-	return strings.ReplaceAll(text, "\n", "\\n")
-}
-
-func (tce *LiteralTagContentEntry) Render(ctx context.Context) (res string, err error) {
-	switch tce.Type {
-	case TagTypeDefault:
-		if len(tce.Content) == 0 {
+	} else {
+		_, err = w.Write([]byte(">"))
+		if err != nil {
 			return
 		}
-		res = fmt.Sprintf("{%s}", jsonSanitize(tce.Content))
-		return
-	case TagTypeOmit:
-		return
-	case TagTypeString:
-		res = fmt.Sprintf("{%s}", jsonSanitize(tce.Content))
-		return
-	case TagTypeStringLiteral:
-		res = fmt.Sprintf("{`%s`}", softSanitize(tce.Content))
-		return
-	case TagTypeRaw:
-		res = tce.Content
-		return
-	default:
-		err = fmt.Errorf("handmd/util/tsrender: invalid tag type: %d", tce.Type)
-		return
+
+		var content string
+		content, err = t.Content.Render(ctx)
+		if err != nil {
+			return
+		}
+
+		_, err = w.Write([]byte(content))
+		if err != nil {
+			return
+		}
+
+		_, err = w.Write([]byte(fmt.Sprintf("</%s>", t.Name)))
+		if err != nil {
+			return
+		}
 	}
 
+	return
 }
