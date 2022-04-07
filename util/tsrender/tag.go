@@ -11,17 +11,17 @@ func marshalTagProps(ctx context.Context, props map[string]any, w io.Writer) (er
 		switch typedV := v.(type) {
 		// TODO(teawithsand): add more types here
 		case int:
-			_, err = w.Write([]byte(fmt.Sprint("%s={%s}\n", k, jsonSanitize(typedV))))
+			_, err = w.Write([]byte(fmt.Sprintf("%s={%s}\n", k, jsonSanitize(typedV))))
 			if err != nil {
 				return
 			}
 		case int64:
-			_, err = w.Write([]byte(fmt.Sprint("%s={%s}\n", k, jsonSanitize(typedV))))
+			_, err = w.Write([]byte(fmt.Sprintf("%s={%s}\n", k, jsonSanitize(typedV))))
 			if err != nil {
 				return
 			}
 		case string:
-			_, err = w.Write([]byte(fmt.Sprint("%s={%s}\n", k, jsonSanitize(typedV))))
+			_, err = w.Write([]byte(fmt.Sprintf("%s={%s}\n", k, jsonSanitize(typedV))))
 			if err != nil {
 				return
 			}
@@ -32,7 +32,7 @@ func marshalTagProps(ctx context.Context, props map[string]any, w io.Writer) (er
 				return
 			}
 
-			_, err = w.Write([]byte(fmt.Sprint("%s=%s\n", k, res)))
+			_, err = w.Write([]byte(fmt.Sprintf("%s=%s\n", k, res)))
 			if err != nil {
 				return
 			}
