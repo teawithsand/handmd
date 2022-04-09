@@ -1,6 +1,9 @@
 package simplesite
 
-import "html/template"
+import (
+	"html/template"
+	"io"
+)
 
 const rawTemplate = `<!DOCTYPE html>
 <html lang="{{ .Lang }}">
@@ -34,3 +37,15 @@ func getCompiledTemplate() *template.Template {
 }
 
 var compiledTemplate = getCompiledTemplate()
+
+type RenderData struct {
+	Head Head
+}
+
+func (srd *RenderData) Render(w io.Writer) (err error) {
+	err = compiledTemplate.Execute(w, srd.Head)
+	if err != nil {
+		return
+	}
+	return
+}

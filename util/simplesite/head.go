@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+// TODO(teawithsand): make render methods there less crappy; sanitize input
+
 func wrapTag(tag, value string) string {
 	if len(value) == 0 {
 		return ""
