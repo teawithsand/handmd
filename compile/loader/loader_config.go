@@ -6,13 +6,15 @@ import (
 	"github.com/teawithsand/handmd/util/fsal"
 )
 
-type Config[T any] struct {
+type Config[C any, O any] struct {
 	Loader   fsal.DataLoader
-	Factory  func() *T // must always return non-nil pointer
+	Factory  func() *O // must always return non-nil pointer
 	FileName string
 }
 
-func (cl *Config[T]) Load(ctx context.Context, fs LoaderInput) (config T, err error) {
+var _ Loader[any, any] = &Config[any, any]{}
+
+func (cl *Config[C, O]) Load(ctx context.Context, lctx C, fs LoaderInput) (config O, err error) {
 	v := cl.Factory()
 	err = cl.Loader.ReadData(fs, cl.FileName, v)
 	if err != nil {

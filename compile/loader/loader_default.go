@@ -1,16 +1,8 @@
 package loader
 
-import (
-	"context"
-	"path"
-	"strings"
+/*
 
-	"github.com/teawithsand/handmd/compile/defines"
-	"github.com/teawithsand/handmd/util/fsal"
-	"github.com/teawithsand/handmd/util/iter"
-)
-
-// Loader whcih loads defines.RawPost
+// Loader which loads defines.RawPost
 type RawPost struct {
 	Loader fsal.DataLoader
 }
@@ -66,3 +58,4 @@ func (bc *RawPost) Load(ctx context.Context, fs LoaderInput) (iterator iter.Iter
 
 	return
 }
+*/

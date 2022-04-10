@@ -17,12 +17,14 @@ func (pw *DirWrapper[C]) Unwrap() C {
 	return pw.LoaderContext
 }
 
-// Loader whcih loads defines.RawPost
+// Loader, which loads all directories and calls inner loader for them.
 type Dir[C any, T any] struct {
 	InnerLoader Loader[DirWrapper[C], T]
 
 	Filter func(ctx context.Context, name string) (ignore bool, err error) // defaults to ignoring dirs starting with . and _
 }
+
+var _ Loader[any, iter.Iterable[any]] = &Dir[any, any]{}
 
 func (dl *Dir[C, T]) Load(ctx context.Context, lctx C, fs LoaderInput) (iterator iter.Iterable[T], err error) {
 	iterator = iter.IterableFunc[T](func(ctx context.Context, recv iter.Receiver[T]) (err error) {
