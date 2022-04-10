@@ -79,6 +79,22 @@ func Filter[T any](it Iterable[T], filter func(ctx context.Context, data T) (boo
 	})
 }
 
+// Note: iterator given must not be parallel one.
+func JoinString(ctx context.Context, it Iterable[string], sep string) (res string, err error) {
+	isFirst := true
+	err = it.Iterate(ctx, Receiver[string](func(ctx context.Context, data string) (err error) {
+		if !isFirst {
+			res += "; "
+		}
+		isFirst = false
+
+		res += data
+		return
+	}))
+
+	return
+}
+
 /*
 This function is too complex and I am really not sure if it should be part of handmd.
 For sake of simplicity, stored as comment rather than branch or sth.
