@@ -15,16 +15,12 @@ type TSComponent struct {
 	BaseImports []tsrender.Import
 }
 
-type TSComponentData struct {
-	Imports []tsrender.Import
-}
-
-type TSRenderData struct {
+type TSComponentRenderData struct {
 	Imports []tsrender.Import
 	Tags    []tsrender.SimpleTag
 }
 
-func (tcr *TSComponent) Render(ctx context.Context, data TSRenderData, fs RendererOutput) (err error) {
+func (tcr *TSComponent) Render(ctx context.Context, data TSComponentRenderData, fs RendererOutput) (err error) {
 	f, err := fs.Open(tcr.TargetPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
 	if err != nil {
 		return
