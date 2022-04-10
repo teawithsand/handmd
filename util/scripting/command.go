@@ -2,6 +2,7 @@ package scripting
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os/exec"
 )
@@ -11,6 +12,7 @@ import (
 type Command struct {
 	Command string
 	Args    []string
+	EnvVars map[string]string
 
 	Stdin  io.Reader
 	Stdout io.Writer
@@ -22,6 +24,10 @@ func (c *Command) Exec(ctx context.Context) (err error) {
 	cmd.Stdout = c.Stdout
 	cmd.Stdin = c.Stdin
 	cmd.Stderr = c.Stderr
+
+	for k, v := range c.EnvVars {
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", k, v))
+	}
 
 	doneChan := make(chan error)
 	go func() {
