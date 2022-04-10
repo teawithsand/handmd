@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Simple node script, which creates fuse.js index from data comming from stdin.
+ * Simple node script, which creates fuse.js index from data coming from stdin.
  */
 
 const fuse = require("fuse.js")

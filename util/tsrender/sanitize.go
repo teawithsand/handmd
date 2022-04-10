@@ -18,5 +18,7 @@ func jsonSanitize[T jsonSanitizeSafe](data T) (res string) {
 }
 
 func mildSanitize(text string) (res string) {
-	return strings.ReplaceAll(text, "\n", "\\n")
+	// note: this is kind of crappy, it should sanitize only those "`" chars, which are not already sanitized.
+	// now we replace "\`" to "\\`", which is not valid thing to do(no escaping in this strings, chars are chars)
+	return strings.ReplaceAll("`", "\\`", strings.ReplaceAll(text, "\n", "\\n"))
 }

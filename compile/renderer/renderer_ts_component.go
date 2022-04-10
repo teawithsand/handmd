@@ -21,10 +21,10 @@ type TSComponentData struct {
 
 type TSRenderData struct {
 	Imports []tsrender.Import
-	Tag     tsrender.SimpleTag
+	Tags    []tsrender.SimpleTag
 }
 
-func (tcr *TSComponent) Render(ctx context.Context, tag tsrender.SimpleTag, fs RendererOutput) (err error) {
+func (tcr *TSComponent) Render(ctx context.Context, data TSRenderData, fs RendererOutput) (err error) {
 	f, err := fs.Open(tcr.TargetPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
 	if err != nil {
 		return
@@ -43,21 +43,37 @@ func (tcr *TSComponent) Render(ctx context.Context, tag tsrender.SimpleTag, fs R
 		}
 	}
 
+	for _, imp := range data.Imports {
+		_, err = f.Write([]byte(imp.Render()))
+		if err != nil {
+			return
+		}
+
+		_, err = f.Write([]byte("\n"))
+		if err != nil {
+			return
+		}
+	}
+
 	_, err = f.Write([]byte(
 		`export default (props: any) => {
-return (`,
+return (
+	<>`,
 	))
 	if err != nil {
 		return
 	}
 
-	err = tag.Render(ctx, f)
-	if err != nil {
-		return
+	for _, tag := range data.Tags {
+		err = tag.Render(ctx, f)
+		if err != nil {
+			return
+		}
 	}
 
 	_, err = f.Write([]byte(
-		`)
+		`	</>
+	)
 }`,
 	))
 	if err != nil {
