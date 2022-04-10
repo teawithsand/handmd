@@ -11,7 +11,7 @@ import (
 // Uses bunch of hacks that I've created.
 // Feel free to write your own renderer.
 type TSComponent struct {
-	TargetPath  string
+	FileName    string
 	BaseImports []tsrender.Import
 }
 
@@ -21,7 +21,7 @@ type TSComponentRenderData struct {
 }
 
 func (tcr *TSComponent) Render(ctx context.Context, data TSComponentRenderData, fs RendererOutput) (err error) {
-	f, err := fs.Open(tcr.TargetPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+	f, err := fs.Open(tcr.FileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
 	if err != nil {
 		return
 	}

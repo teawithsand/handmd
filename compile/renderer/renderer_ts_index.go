@@ -11,7 +11,7 @@ import (
 
 type TSIndex struct {
 	BaseImports []tsrender.Import
-	TargetPath  string
+	FileName    string
 }
 
 type TSIndexRenderEntry = map[string]string
@@ -24,7 +24,7 @@ type TSIndexRenderData struct {
 }
 
 func (tir *TSIndex) Render(ctx context.Context, data TSIndexRenderData, fs RendererOutput) (err error) {
-	f, err := fs.Open(tir.TargetPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+	f, err := fs.Open(tir.FileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
 	if err != nil {
 		return
 	}
