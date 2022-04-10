@@ -95,6 +95,20 @@ func JoinString(ctx context.Context, it Iterable[string], sep string) (res strin
 	return
 }
 
+func Flatten[T any](it Iterable[[]T]) Iterable[T] {
+	return IterableFunc[T](func(ctx context.Context, recv Receiver[T]) (err error) {
+		return it.Iterate(ctx, Receiver[[]T](func(ctx context.Context, data []T) (err error) {
+			for _, e := range data {
+				err = recv(ctx, e)
+				if err != nil {
+					return
+				}
+			}
+			return
+		}))
+	})
+}
+
 /*
 This function is too complex and I am really not sure if it should be part of handmd.
 For sake of simplicity, stored as comment rather than branch or sth.
