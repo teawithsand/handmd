@@ -16,12 +16,12 @@ type TSComponent struct {
 }
 
 type TSComponentData struct {
-	Impots []tsrender.Import
+	Imports []tsrender.Import
 }
 
-type TSRednerData struct {
-	Impots []tsrender.Import
-	Tag    tsrender.SimpleTag
+type TSRenderData struct {
+	Imports []tsrender.Import
+	Tag     tsrender.SimpleTag
 }
 
 func (tcr *TSComponent) Render(ctx context.Context, tag tsrender.SimpleTag, fs RendererOutput) (err error) {
