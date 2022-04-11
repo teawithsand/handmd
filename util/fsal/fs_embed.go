@@ -4,7 +4,6 @@ import (
 	"embed"
 	"io"
 	"io/fs"
-	"io/ioutil"
 )
 
 type EmbedFS struct {
@@ -55,7 +54,7 @@ func (fs *EmbedFS) Open(path string, openMode int) (f File, err error) {
 }
 
 func (fs *EmbedFS) ReadDir(path string) (entries []Entry, err error) {
-	rawEntries, err := ioutil.ReadDir(path)
+	rawEntries, err := fs.FS.ReadDir(path)
 	if err != nil {
 		return
 	}
