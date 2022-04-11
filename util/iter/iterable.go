@@ -95,6 +95,7 @@ func JoinString(ctx context.Context, it Iterable[string], sep string) (res strin
 	return
 }
 
+// Flattens iterable of slices into iterable of element of slice given.
 func Flatten[T any](it Iterable[[]T]) Iterable[T] {
 	return IterableFunc[T](func(ctx context.Context, recv Receiver[T]) (err error) {
 		return it.Iterate(ctx, Receiver[[]T](func(ctx context.Context, data []T) (err error) {
@@ -109,7 +110,7 @@ func Flatten[T any](it Iterable[[]T]) Iterable[T] {
 	})
 }
 
-// Combines multiple iterators into single one.
+// Combines multiple iterables into single one.
 func Chain[T any](iterables ...Iterable[T]) Iterable[T] {
 	return IterableFunc[T](func(ctx context.Context, recv Receiver[T]) (err error) {
 		for _, it := range iterables {
@@ -121,43 +122,3 @@ func Chain[T any](iterables ...Iterable[T]) Iterable[T] {
 		return
 	})
 }
-
-/*
-This function is too complex and I am really not sure if it should be part of handmd.
-For sake of simplicity, stored as comment rather than branch or sth.
-
-type closerFunc func() (err error)
-
-func (f closerFunc) Close() (err error) {
-	return f()
-}
-
-var ErrIteratorClosed = errors.New("handmd/util/iter: iterator was closed before end of iteration")
-
-// Creates channel, which receives elements from iterable given.
-// Iterable will be called in separate goroutine.
-func IterateAsChannel[T any](ctx context.Context, it Iterable[T], done chan<- error) (target chan<- T, closer func()) {
-	closeChan := make(chan struct{})
-	once := sync.Once{}
-	closer = func() {
-		once.Do(func() {
-			close(closeChan)
-		})
-	}
-
-	go func() {
-		done <- it.Iterate(ctx, Receiver[T](func(ctx context.Context, data T) (err error) {
-			select {
-			case target <- data:
-				return
-			case <-closeChan:
-				err = ErrIteratorClosed
-				return
-			case <-ctx.Done():
-				err = ctx.Err()
-				return
-			}
-		}))
-	}()
-	return
-}*/
