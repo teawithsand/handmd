@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-// Note: this function is inherintly unsafe, since it does not limit incoming file size.
+// Note: this function is inherently unsafe, since it does not limit incoming file size.
 // Use only in trusted environments and with caution.
 func ReadFile(fs FS, path string) (data []byte, err error) {
 	b := bytes.NewBuffer(nil)
