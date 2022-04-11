@@ -15,7 +15,8 @@ func TestTag(t *testing.T) {
 				Value: "asdf.js",
 			},
 		},
-		Close: simplesite.SimpleTagClose,
+		RawAttributes: []string{"defer"},
+		Close:         simplesite.SimpleTagClose,
 	}
 
 	res, err := tag.RenderSimple()
@@ -24,8 +25,8 @@ func TestTag(t *testing.T) {
 		return
 	}
 
-	if res != "<script src=\"asdf.js\"</script>" {
-		t.Error("expected different result")
+	if res != "<script src=\"asdf.js\" defer></script>" {
+		t.Error("expected different result", res)
 		return
 	}
 }
