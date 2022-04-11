@@ -6,10 +6,39 @@ import (
 	"io"
 )
 
+type TagPropertyMarshaler interface {
+	MarshalTagProperty(ctx context.Context, w io.Writer) (err error)
+}
+
+// Tag property, which is directly marshaled to typescript.
+type RawTagPropertyValue string
+
+func (rtp RawTagPropertyValue) MarshalTagProperty(ctx context.Context, w io.Writer) (err error) {
+	_, err = w.Write([]byte(rtp))
+	if err != nil {
+		return
+	}
+	return
+}
+
 func marshalTagProps(ctx context.Context, props map[string]any, w io.Writer) (err error) {
 	for k, v := range props {
 		switch typedV := v.(type) {
-		// TODO(teawithsand): add more types here
+		case TagPropertyMarshaler:
+			_, err = w.Write([]byte(fmt.Sprintf("%s={", k)))
+			if err != nil {
+				return
+			}
+
+			err = typedV.MarshalTagProperty(ctx, w)
+			if err != nil {
+				return
+			}
+
+			_, err = w.Write([]byte("}\n"))
+			if err != nil {
+				return
+			}
 		case int:
 			_, err = w.Write([]byte(fmt.Sprintf("%s={%s}\n", k, jsonSanitize(typedV))))
 			if err != nil {
