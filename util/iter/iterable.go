@@ -109,6 +109,19 @@ func Flatten[T any](it Iterable[[]T]) Iterable[T] {
 	})
 }
 
+// Combines multiple iterators into single one.
+func Chain[T any](iterables ...Iterable[T]) Iterable[T] {
+	return IterableFunc[T](func(ctx context.Context, recv Receiver[T]) (err error) {
+		for _, it := range iterables {
+			err = it.Iterate(ctx, recv)
+			if err != nil {
+				return
+			}
+		}
+		return
+	})
+}
+
 /*
 This function is too complex and I am really not sure if it should be part of handmd.
 For sake of simplicity, stored as comment rather than branch or sth.
