@@ -13,6 +13,8 @@ type TagPropertyMarshaler interface {
 // Tag property, which is directly marshaled to typescript.
 type RawTagPropertyValue string
 
+var _ TagPropertyMarshaler = RawTagPropertyValue("")
+
 func (rtp RawTagPropertyValue) MarshalTagProperty(ctx context.Context, w io.Writer) (err error) {
 	_, err = w.Write([]byte(rtp))
 	if err != nil {
