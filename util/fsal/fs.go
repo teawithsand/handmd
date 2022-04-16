@@ -1,6 +1,11 @@
 package fsal
 
-import "io"
+import (
+	"io"
+	"io/fs"
+)
+
+type FileInfo = fs.FileInfo
 
 type File interface {
 	io.Closer
@@ -9,6 +14,8 @@ type File interface {
 	io.Seeker
 	io.ReaderAt
 	io.WriterAt
+
+	Stat() (FileInfo, error)
 }
 
 type Entry interface {
@@ -23,7 +30,7 @@ type FS interface {
 	Rename(from, to string) (err error)
 	Mkdir(path string) (err error)
 	Remove(path string) (err error) // also works as RMDIr
-	Stat(path string) (e Entry, err error)
+	Stat(path string) (e FileInfo, err error)
 
 	RemoveAll(path string) (err error)
 	MkdirAll(path string) (err error)

@@ -12,6 +12,8 @@ type PrefixFS struct {
 	PathPrefix string
 }
 
+var _ FS = &PrefixFS{}
+
 func (fs *PrefixFS) translatePath(inputPath string) string {
 	pp := path.Clean(fs.PathPrefix)
 
@@ -58,6 +60,6 @@ func (fs *PrefixFS) RemoveAll(path string) (err error) {
 	return
 }
 
-func (fs *PrefixFS) Stat(path string) (entry Entry, err error) {
+func (fs *PrefixFS) Stat(path string) (entry FileInfo, err error) {
 	return fs.Wrapped.Stat(fs.translatePath(path))
 }

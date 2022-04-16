@@ -53,6 +53,6 @@ func (fs *LocalFS) RemoveAll(path string) (err error) {
 	return
 }
 
-func (fs *LocalFS) Stat(path string) (entry Entry, err error) {
+func (fs *LocalFS) Stat(path string) (entry FileInfo, err error) {
 	return os.Stat(path)
 }

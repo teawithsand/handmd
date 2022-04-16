@@ -90,7 +90,7 @@ func (fs *EmbedFS) RemoveAll(path string) (err error) {
 	return
 }
 
-func (fs *EmbedFS) Stat(inputPath string) (entry Entry, err error) {
+func (fs *EmbedFS) Stat(inputPath string) (entry FileInfo, err error) {
 	f, err := fs.FS.Open(inputPath)
 	if err != nil {
 		return
