@@ -94,27 +94,3 @@ func (b *CSPBuilder) RenderSimple() (res string, err error) {
 
 	return
 }
-
-/*
-// CSPMW is nice for static CSPs, but it's kind of annoying to use
-// when CSP is dynamic, for instance due to nonce.
-
-type CSPMW struct {
-	// Note: you want to have this written by hand or use CSPBuilder instead.
-	ValueGenerator func(nonce string) string
-	NonceGenerator nonce.Generator
-}
-
-func (mw *CSPMW) render() (res string) {
-	return ""
-}
-
-func (mw *CSPMW) Apply(h http.Handler) http.Handler {
-	csp := mw.render()
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set(CSPHeaderName, csp)
-		h.ServeHTTP(w, r)
-	})
-}
-
-*/
