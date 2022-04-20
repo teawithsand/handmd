@@ -5,7 +5,11 @@ import (
 )
 
 // Collection of elements of type T, which may be iterated on.
+//
 // Note: iterables are allowed to be concurrent. They may launch multiple goroutines at the same time, even though that's not the default.
+//
+// Iterables are allowed to wrap resources, which require shutting down.
+// In that case, resource is acquired when `Iterate` is called and it's released when error is returned or when iteration ends.
 type Iterable[T any] interface {
 	Iterate(ctx context.Context, recv Receiver[T]) (err error)
 }
