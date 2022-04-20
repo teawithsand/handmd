@@ -1,0 +1,6 @@
+github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
+github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
+github.com/stretchr/testify v1.4.0 h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJyk=
+go.uber.org/dig v1.14.1 h1:fyakRgZDdi2F8FgwJJoRGangMSPTIxPSLGzR3Oh0/54=
+go.uber.org/dig v1.14.1/go.mod h1:52EKx/Vjdpz9EzeNcweC4YMsTrDdFn9mS/+Uw5ZnVTI=
+gopkg.in/yaml.v2 v2.2.2 h1:ZCJp+EgiOT7lHqUV2J862kp8Qj64Jo6az82+3Td9dZw=
