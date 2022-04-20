@@ -8,6 +8,21 @@ import (
 type LocalFS struct {
 }
 
+// Constructs local FS
+func NewLocalFS() FS {
+	return &LocalFS{}
+}
+
+// Returns fs, which points to root of temporary directory.
+// On linux, in most cases it's /tmp.
+// See docs for os.TempDir() for more info.
+func LocalTempFS() FS {
+	return &PrefixFS{
+		Wrapped:    NewLocalFS(),
+		PathPrefix: os.TempDir(),
+	}
+}
+
 var _ FS = &LocalFS{}
 
 func (fs *LocalFS) Open(path string, openMode int) (f File, err error) {
