@@ -2,16 +2,12 @@
 // It wasn't crated as general-purpose DI, but something to make compilation process simpler.
 package ctn
 
-import (
-	"go.uber.org/dig"
-)
-
 type Container struct {
-	dig *dig.Container
+	dig DI
 }
 
 // HACK(teawithsand): for now do not implement proper container, just ust
-func (c *Container) Inner() *dig.Container {
+func (c *Container) Inner() DI {
 	return c.dig
 }
 
@@ -25,7 +21,7 @@ func (c *Container) Close() (err error) {
 
 // Container, created especially for compilation process.
 func NewCompilationContainer() (ctn *Container, err error) {
-	c := dig.New()
+	c := NewDI()
 	err = c.Provide(func() (reg Cleaner, err error) {
 		reg = NewCleaner()
 		return
