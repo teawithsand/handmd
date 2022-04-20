@@ -10,10 +10,13 @@ type CleanRegistry interface {
 }
 
 type Cleaner interface {
-	io.Closer
 	CleanRegistry
+
+	// Closes all registered closers.
+	Clean() (err error)
 }
 
+// Default implementation of cleaner
 type cleaner struct {
 	lock    sync.Mutex
 	closers []io.Closer
@@ -25,7 +28,7 @@ func (c *cleaner) Register(closer io.Closer) {
 	c.closers = append(c.closers, closer)
 }
 
-func (c *cleaner) Close() (err error) {
+func (c *cleaner) Clean() (err error) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
